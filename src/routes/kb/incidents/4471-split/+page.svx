@@ -1,0 +1,55 @@
+---
+layout: runbook
+title: '#4471 · three problems, not one'
+owner: farmerpaul
+status: proposed
+reviewed: 2026-11-02
+signature: v1.eyJzdWIiOiI0Mzk0IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTM2Mjg4MjcsImV4cCI6MTc5MzcxNTIyN30.s-QVI1qmHdNz3EhiShj8evMiF35UcPsYpzmKdD0UO8U
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+
+  const repo = 'https://github.com/farmerpaul/mega-what-it-shows/issues';
+  const issues = { parser: `${repo}/1`, hint: `${repo}/2`, 'one-day': `${repo}/3` };
+</script>
+
+[#4471](/kb/incidents/4471) says one issue, one fix queued. Its reports show three problems. The
+queued parser fix closes only one of them.
+
+<ProblemTable ticket={4471} {issues} />
+
+<Callout kind="warn">
+Keep #4471 open until each ticket above has its own fix. A shipped parser fix does not end the wrong dates.
+</Callout>
+
+## What each problem is
+
+- **`parser`**: the shared parser reads every date month first, so a day-first tenant's dates swap
+  day and month. It reaches every channel.
+- **`hint`**: booking-v3 prints `MM/DD/YYYY` under its date field, but the form reads the tenant's
+  way. People follow the hint and the date swaps. Only form reports from day-first booking-v3
+  tenants belong here. The symptom matches `parser`, and the fix is in the form.
+- **`one-day`**: the date moves by one day with no swap, which month-first parsing cannot do. The
+  cause is not confirmed. The Lisbon and Toronto report points to time zones; check that first.
+
+## How the count was made
+
+1. Remove repeats by report id: the export's overlapping pages list some reports twice.
+2. Place each report by its tenant, form and channel with `causes.ts`. Do not use the intake tag:
+   it is a guess from the reporter's browser, and it disagrees with the tenant often.
+3. Move the reports on the desk's one-day list out of the `parser` count, because their text
+   does not describe a swap.
+
+The [#4471 table](/kb/incidents/4471) still files one-day reports under `parser` by tenant, so its
+`parser` row is larger than the one here.
+
+## How this happened
+
+[Decision 0001](/kb/decisions/0001-dedupe-by-subject) merges on subject alone. These problems share
+subjects, so nobody had to read a body to merge them. The decision stands until a new record
+replaces it; this page does not change it.
+
+<RenderStamp {signature} />
